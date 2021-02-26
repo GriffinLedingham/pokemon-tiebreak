@@ -1,0 +1,77 @@
+<script
+  src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+  integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+  crossorigin="anonymous"></script>
+<style>
+input {
+  display:inline-block;
+  width:50px;
+}
+</style>
+Team 1<br>
+<div id="team1"></div>
+<div>
+  Team 1 Sum: <span id="team1_tot"></span>
+</div>
+Team 2 <br>
+<div id="team2"></div>
+<div>
+  Team 2 Sum: <span id="team2_tot"></span>
+</div>
+<script>
+function calcMaxHP(base, evs, ivs, level) {
+  let total;
+  if (base === 1) {
+    total = 1;
+  } else {
+    total =
+      Math.floor(((base * 2 + ivs + Math.floor(evs / 4)) * level) / 100) +
+      level +
+      10;
+  }
+  return total;
+}
+
+function doCalc() {
+	for(let teamId = 1;teamId <= 2; teamId++) {
+  	let teamSum = 0
+    let teamSumMax = 0
+  	for(let i = 0; i< 4;i++) {
+    	let max = calcMaxHP(
+      	parseInt($(`#p${i}t${teamId}_base`).val()) || 0,
+      	parseInt($(`#p${i}t${teamId}_ev`).val()) || 0,
+      	parseInt($(`#p${i}t${teamId}_iv`).val()) || 0,
+      	parseInt($(`#p${i}t${teamId}_level`).val()) || 50,
+      )
+      if($(`#p${i}t${teamId}_max_force`).val() != '') {
+      	max = parseInt($(`#p${i}t${teamId}_max_force`).val())
+      }
+      let cur = ($(`#p${i}t${teamId}_curr`).val() != '') ? parseInt($(`#p${i}t${teamId}_curr`).val()) : max
+      let per = (100*cur/max)
+      console.log(cur,max,per)
+      teamSum += cur
+      teamSumMax += max
+    	$(`#p${i}t${teamId}_curr_final`).text(cur)
+    	$(`#p${i}t${teamId}_hp`).text(max)
+    	//$(`#p${i}t${teamId}_per`).text(per.toString() + '%')
+    }
+    $(`#team${teamId}_tot`).text((100*teamSum/teamSumMax).toString() + '%')
+  }
+}
+
+for(let teamId = 1;teamId <= 2; teamId++) {
+
+  for(let i = 0; i< 4;i++) {
+  $(`#team${teamId}`).append(`
+    Pokemon ${i}: <input id="p${i}t${teamId}_curr" placeholder="Curr HP" /> / <input id="p${i}t${teamId}_base" placeholder="Base" /><input id="p${i}t${teamId}_iv" placeholder="IV" /><input id="p${i}t${teamId}_ev" placeholder="EV" /><input id="p${i}t${teamId}_level" placeholder="Level" /> OR <input id="p${i}t${teamId}_max_force" placeholder="Max HP" /> <b><span id="p${i}t${teamId}_curr_final"></span> / <span id="p${i}t${teamId}_hp"></span> <!--(<span id="p${i}t${teamId}_per"></span>)--></b><br>
+  `)
+  }
+}
+
+$(document).on('keyup', () => {
+	doCalc()
+})
+
+doCalc()
+
+</script>
