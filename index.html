@@ -104,7 +104,6 @@ function doCalc(e) {
       let currDefault = 0
       if(!initialRendered) currDefault = max
       let cur = Math.min(max,($(`#p${i}t${teamId}_curr`).val() != '') ? parseInt($(`#p${i}t${teamId}_curr`).val()) : currDefault)
-      if(e != undefined && $(e.target).data('field') != 'curr-hp') cur = max
       let per = (100*cur/max)
       teamSum += cur
       teamSumMax += max
