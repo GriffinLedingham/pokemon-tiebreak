@@ -105,25 +105,31 @@ function doCalc(e) {
   	let teamSum = 0
     let teamSumMax = 0
   	for(let i = 0; i< 4;i++) {
-    	let max = calcMaxHP(
-      	parseInt($(`#p${i}t${teamId}_base`).val()) || 0,
-      	parseInt($(`#p${i}t${teamId}_ev`).val()) || 0,
-      	parseInt($(`#p${i}t${teamId}_iv`).val()) || 0,
-      	parseInt($(`#p${i}t${teamId}_level`).val()) || 50,
-      )
+      let max
+      if(e == undefined || $(e.target).data('field') != 'max' && $(e.target).data('field') != 'curr-hp') {
+        max = calcMaxHP(
+          parseInt($(`#p${i}t${teamId}_base`).val()) || 0,
+          parseInt($(`#p${i}t${teamId}_ev`).val()) || 0,
+          parseInt($(`#p${i}t${teamId}_iv`).val()) || 0,
+          parseInt($(`#p${i}t${teamId}_level`).val()) || 50,
+        )
+      } else {
+        max = $(`#p${i}t${teamId}_max_force`).val()
+      }
       let currDefault = 0
       if(!initialRendered) currDefault = max
-      let cur = Math.min(max,($(`#p${i}t${teamId}_curr`).val() != '') ? parseInt($(`#p${i}t${teamId}_curr`).val()) : currDefault)
+
+      let cur
+      if(e == undefined || $(e.target).data('field') != 'max' && $(e.target).data('field') != 'curr-hp') {
+        cur = Math.min(max,($(`#p${i}t${teamId}_curr`).val() != '') ? parseInt($(`#p${i}t${teamId}_curr`).val()) : currDefault)
+      } else {
+        cur = Math.min(max, $(`#p${i}t${teamId}_curr`).val())
+      }
       let per = (100*cur/max)
       teamSum += cur
       teamSumMax += max
-      if(e == undefined || $(e.target).data('field') != 'curr-hp') {
-        $(`#p${i}t${teamId}_curr`).val(cur)
-      }
-      if(e == undefined || $(e.target).data('field') != 'max') {
-        $(`#p${i}t${teamId}_max_force`).val(max)
-      }
-    	//$(`#p${i}t${teamId}_per`).text(per.toString() + '%')
+      $(`#p${i}t${teamId}_curr`).val(cur)
+      $(`#p${i}t${teamId}_max_force`).val(max)
     }
     $(`#team${teamId}_tot`).text((100*teamSum/teamSumMax).toString() + '%')
   }
