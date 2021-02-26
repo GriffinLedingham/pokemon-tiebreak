@@ -120,7 +120,7 @@ function doCalc(e) {
       if(e == undefined || $(e.target).data('field') != 'curr-hp') {
         $(`#p${i}t${teamId}_curr`).val(cur)
       }
-      if(e == undefined || $(e.target).data('field') != 'max') {
+      if(e == undefined || $(e.target).data('field') != 'max' && $(e.target).data('field') != 'curr-hp') {
         $(`#p${i}t${teamId}_max_force`).val(max)
       }
     	//$(`#p${i}t${teamId}_per`).text(per.toString() + '%')
