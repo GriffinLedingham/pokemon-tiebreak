@@ -51,7 +51,6 @@ input {
 let initialRendered = false
 let allPokemon = []
 $.ajax('https://pokeapi.co/api/v2/pokemon?offset=0&limit=10000').done((body) => {
-  console.log(body)
   allPokemon = body.results
   allPokemon.unshift({'name': 'no pokemon', 'url': ''})
   renderAllDD()
@@ -63,14 +62,16 @@ $(document).on('change', '.pokemon-dd', function(e) {
   $.ajax($(this).val()).done((body) => {
     $(`#${team}_${num}_img`).html(`<img style="height: 50px;vertical-align: middle;" src="${body.sprites.front_default}" />`)
     $(`#p${num}t${team}_base`).val(body.stats[0].base_stat)
-    let max = calcMaxHP(
-      parseInt($(`#p${num}t${team}_base`).val()) || 0,
-      parseInt($(`#p${num}t${team}_ev`).val()) || 0,
-      parseInt($(`#p${num}t${team}_iv`).val()) || 0,
-      parseInt($(`#p${num}t${team}_level`).val()) || 50,
-    )
-    $(`#p${num}t${team}_curr`).val(max)
-    $(`#p${num}t${team}_max_force`).val(max)
+    if($(`#p${num}t${team}_override`).is(':checked') == false) {
+      let max = calcMaxHP(
+        parseInt($(`#p${num}t${team}_base`).val()) || 0,
+        parseInt($(`#p${num}t${team}_ev`).val()) || 0,
+        parseInt($(`#p${num}t${team}_iv`).val()) || 0,
+        parseInt($(`#p${num}t${team}_level`).val()) || 50,
+      )
+      $(`#p${num}t${team}_curr`).val(max)
+      $(`#p${num}t${team}_max_force`).val(max)
+    }
     doCalc()
   })
 })
@@ -106,7 +107,10 @@ function doCalc(e) {
     let teamSumMax = 0
   	for(let i = 0; i< 4;i++) {
       let max
-      if(e == undefined || $(e.target).data('field') != 'max' && $(e.target).data('field') != 'curr-hp') {
+      if((e == undefined || ($(e.target).data('field') != 'max' &&
+          $(e.target).data('field') != 'curr-hp')) &&
+          $(`#p${i}t${teamId}_override`).is(':checked') == false
+      ) {
         max = calcMaxHP(
           parseInt($(`#p${i}t${teamId}_base`).val()) || 0,
           parseInt($(`#p${i}t${teamId}_ev`).val()) || 0,
@@ -149,15 +153,21 @@ for(let teamId = 1;teamId <= 2; teamId++) {
       <div>IV: <input id="p${i}t${teamId}_iv" placeholder="0" data-field="iv" type="number" /></div>
       <div>EV: <input id="p${i}t${teamId}_ev" placeholder="0" data-field="ev" type="number" /></div>
       <div>Level: <input id="p${i}t${teamId}_level" placeholder="50" data-field="level" type="number"/></div>
+      <div>Override Max HP: <input id="p${i}t${teamId}_override" type="checkbox" /></div>
     </div>
-    <div><div>HP: <input id="p${i}t${teamId}_curr" data-field="curr-hp" placeholder="Curr HP" type="number" min=0 /> / <input id="p${i}t${teamId}_max_force" data-field="max" placeholder="Max HP" type="number" /></div>
+    <div><div>HP: <input id="p${i}t${teamId}_curr" data-field="curr-hp" placeholder="Curr HP" type="number" min=0 /> / <input class="max-hp-override" id="p${i}t${teamId}_max_force" data-p="${i}" data-t="${teamId}" data-field="max" placeholder="Max HP" type="number" /></div>
     </div></div>
   `)
   }
 }
 
+$(document).on('keyup change', '.max-hp-override', function(e) {
+  var p = $(this).data('p')
+  var t = $(this).data('t')
+
+  $(`#p${p}t${t}_override`).prop('checked', true)
+})
 $(document).on('keyup change', (e) => {
-  console.log(e)
 	doCalc(e)
 })
 
